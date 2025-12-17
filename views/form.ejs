@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Input Data Produksi</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; background: #f9f9f9; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-top: 0; }
+        label { display: block; margin: 10px 0 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; width: 100%; }
+        button:hover { background: #0056b3; }
+        .back-link { display: block; text-align: center; margin-top: 20px; text-decoration: none; color: #555; }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">📝 Input Data Produksi</h1>
+
+    <div class="container">
+        <h2>1. Tambah Produk Baru</h2>
+        <form action="/add-product" method="POST">
+            <label>Nama Produk:</label>
+            <input type="text" name="name" placeholder="Contoh: Baut 5mm" required>
+            
+            <label>Target Defect Rate (Desimal):</label>
+            <input type="number" step="0.01" name="target_defect_rate" placeholder="Contoh: 0.05" required>
+            
+            <button type="submit">Simpan Produk</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <h2>2. Lapor Hasil Produksi (Harian)</h2>
+        <form action="/add-log" method="POST">
+            <label>Pilih Produk:</label>
+            <select name="productId" required>
+                <% products.forEach(p => { %>
+                    <option value="<%= p.id %>"><%= p.name %></option>
+                <% }) %>
+            </select>
+
+            <label>Tanggal Produksi:</label>
+            <input type="date" name="date" required>
+
+            <label>Total Diproduksi (Unit):</label>
+            <input type="number" name="total_produced" placeholder="Misal: 100" required>
+
+            <label>Jumlah Cacat (Unit):</label>
+            <input type="number" name="defect_count" placeholder="Misal: 2" required>
+
+            <button type="submit" style="background-color: #28a745;">Simpan Laporan</button>
+        </form>
+    </div>
+
+    <a href="/" class="back-link">⬅ Kembali ke Dashboard</a>
+</body>
+</html>
