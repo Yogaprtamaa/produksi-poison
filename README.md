@@ -28,7 +28,8 @@ Ikuti langkah ini untuk menjalankan aplikasi di komputer Anda:
 
 1.  **Clone Repository**
     ```bash
-    git clone [https://github.com/username-anda/qc-poisson-dashboard.git](https://github.com/username-anda/qc-poisson-dashboard.git)
+    git clone https://github.com/Yogaprtamaa/produksi-poison.git
+
     cd qc-poisson-dashboard
     ```
 
