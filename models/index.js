@@ -10,29 +10,11 @@ const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
 let sequelize;
-
-// --- LOGIKA DUAL DATABASE (CANGGIH) ---
-if (process.env.DATABASE_URL) {
-  // OPSI 1: Jika di RENDER (Online) -> Pakai PostgreSQL
-  sequelize = new Sequelize(process.env.DATABASE_URL, {
-    dialect: 'postgres',
-    protocol: 'postgres',
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false
-      }
-    }
-  });
+if (config.use_env_variable) {
+  sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
-  // OPSI 2: Jika di LAPTOP (Local) -> Pakai SQLite
-  sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: 'database.sqlite',
-    logging: false
-  });
+  sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
-// --------------------------------------
 
 fs
   .readdirSync(__dirname)

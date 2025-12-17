@@ -1,8 +1,6 @@
 const express = require('express');
 const app = express();
-
-// UPDATE 1: Gunakan Port dari Render jika ada, kalau tidak pakai 3000
-const port = process.env.PORT || 3000;
+const port = 3000;
 
 // 1. Import Model Database & Class OOP
 const { Product, ProductionLog } = require('./models');
@@ -23,7 +21,7 @@ app.get('/', async (req, res) => {
                 model: ProductionLog, 
                 as: 'ProductionLogs' 
             }],
-            // Urutkan agar data terbaru muncul paling atas
+            // UPDATE: Urutkan agar data terbaru muncul paling atas
             order: [
                 ['id', 'ASC'], // Produk urut abjad/ID
                 [{ model: ProductionLog, as: 'ProductionLogs' }, 'date', 'DESC'] // Log urut tanggal terbaru
@@ -39,6 +37,7 @@ app.get('/', async (req, res) => {
                 name: product.name,
                 lambda: analysis.lambda,
                 predictions: analysis.predictions,
+                // PENTING: Kita kirim data logs asli ke frontend
                 logs: product.ProductionLogs 
             };
         });
@@ -67,7 +66,7 @@ app.get('/seed', async (req, res) => {
         // 2. Buat Log Produk 1
         await ProductionLog.bulkCreate([
             { date: new Date(), total_produced: 100, defect_count: 2, productId: p1.id },
-            { date: new Date(), total_produced: 100, defect_count: 5, productId: p1.id },
+            { date: new Date(), total_produced: 100, defect_count: 5, productId: p1.id }, // Cacat tinggi
             { date: new Date(), total_produced: 100, defect_count: 0, productId: p1.id },
             { date: new Date(), total_produced: 100, defect_count: 1, productId: p1.id }
         ]);
@@ -108,15 +107,17 @@ app.post('/add-product', async (req, res) => {
         res.send(error.message);
     }
 });
-
 // ==========================================
 // ROUTE 5: HAPUS DATA LOG (DELETE)
 // ==========================================
 app.post('/delete-log/:id', async (req, res) => {
     try {
+        // Hapus data berdasarkan ID yang dikirim
         await ProductionLog.destroy({
             where: { id: req.params.id }
         });
+        
+        // Balik lagi ke dashboard
         res.redirect('/');
     } catch (error) {
         res.send("Gagal menghapus: " + error.message);
@@ -130,10 +131,12 @@ app.post('/delete-log/:id', async (req, res) => {
 // A. Tampilkan Halaman Edit (GET)
 app.get('/edit-log/:id', async (req, res) => {
     try {
+        // Cari data log berdasarkan ID, dan sertakan nama Produknya
         const log = await ProductionLog.findOne({
             where: { id: req.params.id },
-            include: ['Product']
+            include: ['Product'] // Pastikan model Product terhubung
         });
+
         res.render('edit', { log });
     } catch (error) {
         res.send("Error: " + error.message);
@@ -144,6 +147,8 @@ app.get('/edit-log/:id', async (req, res) => {
 app.post('/update-log/:id', async (req, res) => {
     try {
         const { date, total_produced, defect_count } = req.body;
+
+        // Update data di database
         await ProductionLog.update({
             date,
             total_produced,
@@ -151,7 +156,8 @@ app.post('/update-log/:id', async (req, res) => {
         }, {
             where: { id: req.params.id }
         });
-        res.redirect('/');
+
+        res.redirect('/'); // Balik ke dashboard
     } catch (error) {
         res.send("Gagal update: " + error.message);
     }
@@ -169,5 +175,5 @@ app.post('/add-log', async (req, res) => {
 
 // JALANKAN SERVER
 app.listen(port, () => {
-    console.log(`Aplikasi jalan di Port ${port}`);
+    console.log(`Aplikasi jalan di http://localhost:${port}`);
 });
